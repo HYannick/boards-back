@@ -1,0 +1,8 @@
+<h2> Hello {{ username }} </h2>
+<p>
+    Welcome to the Boards fellow!
+</p>
+
+<p>
+    <a href="{{ appUrl('api/v1/register/confirm/' + confirmation_token) }}">Confirm Email address</a>
+</p>
