@@ -34,29 +34,31 @@ class UploadController {
   }
 
   async uploadImage({request, auth, response,}) {
-    const {folder, slug} = request.get()
+    const {folder, slug, contentType} = request.get()
+    const extension = contentType.split('/')[1] || 'jpg'
+
     const user = await auth.getUser()
     let key
     switch(folder) {
       case 'avatar':
-        key = `${user.id}/${uuid()}.jpeg`
+        key = `${user.id}/${uuid()}.${extension}`
         break
       case 'book':
-        key = `${user.id}/${slug}/${uuid()}.jpeg`
+        key = `${user.id}/${slug}/${uuid()}.${extension}`
         break
       case 'book/previews':
-        key = `${user.id}/${slug}/previews/${uuid()}.jpeg`
+        key = `${user.id}/${slug}/previews/${uuid()}.${extension}`
         break
       case 'book/ressources':
-        key = `${user.id}/${slug}/ressources/${uuid()}.jpeg`
+        key = `${user.id}/${slug}/ressources/${uuid()}.${extension}`
         break
       default :
-        key = `${user.id}/${uuid()}.jpeg`
+        key = `${user.id}/${uuid()}.${extension}`
     }
 
     const signedUrl = await s3.getSignedUrlPromise('putObject', {
       Bucket: Env.get('S3_BUCKET'),
-      ContentType: 'image/jpeg',
+      ContentType: contentType,
       Key: key
     })
     response.json({key, signedUrl})
