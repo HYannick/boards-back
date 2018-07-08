@@ -29,6 +29,8 @@ Route.group('/api', () => {
 
 
   Route.post('/book/create', 'BookController.create').middleware(['auth_required'])
+  Route.get('/book/:id/details', 'BookController.getBookDetails')
+  Route.get('/book/:id/infos', 'BookController.getBookMainInfos')
 
   Route.get('/user', 'UserController.getUser').middleware(['auth_required'])
   Route.put('/user', 'UserController.updateUser').middleware(['auth_required'])

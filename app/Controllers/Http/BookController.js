@@ -4,6 +4,19 @@ const {validate} = use('Validator')
 const Book = use('App/Models/Book')
 
 class BookController {
+  async getBookMainInfos({request, response, params}) {
+    const book = await Book.findBy('id', params.id)
+    response.json({book})
+  }
+  async getBookDetails({request, response, params}) {
+    const book = await Book.query()
+      .where('id', params.id)
+      .with('previews')
+      .with('ressources')
+      .fetch()
+
+    response.json(book.toJSON()[0])
+  }
 
   async create({request, response, auth}) {
     const book_data = request.except(['previews', 'ressources', 'languages'])
