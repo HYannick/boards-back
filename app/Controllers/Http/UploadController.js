@@ -1,6 +1,8 @@
 'use strict'
 const AWS = require('aws-sdk')
 const Env = use('Env')
+const Drive = use('Drive')
+const Helpers = use('Helpers')
 const uuid = require('uuid/v1')
 
 AWS.S3.prototype.getSignedUrlPromise = function (operation, params) {
@@ -19,6 +21,13 @@ const s3 = new AWS.S3({
 })
 
 class UploadController {
+  async viewImage({response, params}) {
+    const filepath = await  Helpers.resourcesPath('assets/img/' + params.name)
+    const picture = await Drive.get(filepath)
+    response.type('image/jpeg')
+      .send(picture)
+  }
+
   async removeImage(key) {
     const params = {
       Key: key,
@@ -33,14 +42,15 @@ class UploadController {
     }
   }
 
-  async uploadImage({request, auth, response,}) {
+  async uploadImage({request, auth, response}) {
     const {folder, slug, contentType} = request.get()
-    const extension = contentType.split('/')[1] || 'jpg'
+
+    const extension = contentType ? contentType.split('/')[1] : 'jpg'
 
     const user = await auth.getUser()
     let key
-    switch(folder) {
-      case 'avatar':
+    switch (folder) {
+      case 'avatar' || 'background':
         key = `${user.id}/${uuid()}.${extension}`
         break
       case 'book':
@@ -66,9 +76,16 @@ class UploadController {
 
   async updateUserAvatar({request, auth, response}) {
     const user = await auth.getUser()
-    await this.removeImage(user.profile_img)
+    if(request.input('avatarUrl')) {
+      await this.removeImage(user.profile_img)
+      user.profile_img = request.input('avatarUrl')
+    }
 
-    user.profile_img = request.input('avatarUrl')
+    if(request.input('backgroundUrl')) {
+      await this.removeImage(user.background_img)
+      user.background_img = request.input('backgroundUrl')
+    }
+
     await user.save()
     response.json({success: 'Avatar updated', profile_img: user.profile_img})
   }

@@ -32,11 +32,12 @@ Route.group('/api', () => {
   Route.get('/book/:id/details', 'BookController.getBookDetails')
   Route.get('/book/:id/infos', 'BookController.getBookMainInfos')
 
-  Route.get('/user', 'UserController.getUser').middleware(['auth_required'])
+  Route.get('/user', 'UserController.getAuthUser').middleware(['auth_required'])
+  Route.get('/user/:id', 'UserController.getUser')
   Route.put('/user', 'UserController.updateUser').middleware(['auth_required'])
   Route.get('/user/:username/books', 'UserController.getBooks')
   Route.get('/user/:username/favorites', 'FavoriteController.getFav')
-  Route.post('/user/avatar', 'UploadController.updateUserAvatar')
+  Route.post('/user/updateMedias', 'UploadController.updateUserAvatar')
 
   Route.post('/favorite', 'FavoriteController.favorite')
   //   Route.post('password/email', 'Auth/PasswordResetController.sendResetLinkEmail')
@@ -44,6 +45,7 @@ Route.group('/api', () => {
   //   Route.post('password/reset', 'Auth/PasswordResetController.reset')
 
   Route.get('/upload', 'UploadController.uploadImage')
+  Route.get('/assets/:name', 'UploadController.viewImage')
   Route.delete('/upload/:key', 'UploadController.removeImage')
 }).prefix('/api/v1')
 
